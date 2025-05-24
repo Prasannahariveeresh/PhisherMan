@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "URL Fetcher",
+  "version": "1.0",
+  "description": "Fetch all URLs from the current page.",
+  "permissions": ["scripting", "activeTab"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Fetch URLs"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
