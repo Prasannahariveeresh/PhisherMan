@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BetMax Pro - Sports Betting</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    .header {
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(45deg, #00d4ff, #090979);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-decoration: none;
+    }
+
+    .nav-menu {
+      display: flex;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .nav-item {
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .nav-item:hover {
+      color: #00d4ff;
+    }
+
+    .nav-item::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #00d4ff, #090979);
+      transition: width 0.3s ease;
+    }
+
+    .nav-item:hover::after {
+      width: 100%;
+    }
+
+    .user-actions {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .balance {
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      padding: 8px 16px;
+      border-radius: 25px;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .login-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 80px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23ffffff" stroke-width="0.1" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      opacity: 0.3;
+    }
+
+    .hero-content {
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 800;
+      margin-bottom: 20px;
+      background: linear-gradient(45deg, #00d4ff, #ffffff, #090979);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: #b8c6db;
+      margin-bottom: 40px;
+      font-weight: 400;
+    }
+
+    .cta-button {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 15px 40px;
+      border: none;
+      border-radius: 50px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      margin: 10px;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(240, 147, 251, 0.4);
+    }
+
+    .cta-secondary {
+      background: transparent;
+      border: 2px solid #00d4ff;
+      color: #00d4ff;
+    }
+
+    .cta-secondary:hover {
+      background: #00d4ff;
+      color: #0f0f23;
+      box-shadow: 0 15px 30px rgba(0, 212, 255, 0.4);
+    }
+
+    /* Sports Grid */
+    .sports-section {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 80px 20px;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 50px;
+      color: #ffffff;
+    }
+
+    .sports-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+      margin-bottom: 50px;
+    }
+
+    .sport-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 30px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sport-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .sport-card:hover::before {
+      left: 100%;
+    }
+
+    .sport-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      border-color: rgba(0, 212, 255, 0.5);
+    }
+
+    .sport-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .sport-icon {
+      font-size: 2.5rem;
+    }
+
+    .sport-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .match {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .match-teams {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .team {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .vs {
+      color: #00d4ff;
+      font-weight: 700;
+    }
+
+    .match-time {
+      color: #b8c6db;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+    }
+
+    .odds-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .odd-btn {
+      flex: 1;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      text-align: center;
+      display: block;
+    }
+
+    .odd-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Live Section */
+    .live-section {
+      background: rgba(255, 0, 0, 0.1);
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 20px;
+      padding: 30px;
+      margin: 40px 0;
+    }
+
+    .live-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .live-dot {
+      width: 12px;
+      height: 12px;
+      background: #ff0000;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .live-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #ff4757;
+    }
+
+    /* Promotions */
+    .promo-section {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      margin: 40px 0;
+    }
+
+    .promo-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .promo-text {
+      font-size: 1.1rem;
+      margin-bottom: 25px;
+      opacity: 0.9;
+    }
+
+    .promo-btn {
+      background: white;
+      color: #667eea;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 25px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .promo-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Footer */
+    .footer {
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 50px 20px 30px;
+      margin-top: 80px;
+    }
+
+    .footer-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 40px;
+      margin-bottom: 30px;
+    }
+
+    .footer-section h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #00d4ff;
+    }
+
+    .footer-section a {
+      color: #b8c6db;
+      text-decoration: none;
+      display: block;
+      margin-bottom: 10px;
+      transition: color 0.3s ease;
+    }
+
+    .footer-section a:hover {
+      color: #00d4ff;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: #b8c6db;
+      font-size: 0.9rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        height: auto;
+        padding: 15px 20px;
+        gap: 15px;
+      }
+
+      .nav-menu {
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .sports-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .hero {
+        padding: 60px 20px;
+      }
+
+      .sport-card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <a href="https://locker-reprogrammation.com/" class="logo">BetMax Pro</a>
+      
+      <nav class="nav-menu">
+        <a href="#" class="nav-item">Sports</a>
+        <a href="#" class="nav-item">Live</a>
+        <a href="#" class="nav-item">Casino</a>
+        <a href="#" class="nav-item">Promotions</a>
+        <a href="#" class="nav-item">Results</a>
+      </nav>
+
+      <div class="user-actions">
+        <div class="balance">Balance: $1,250.00</div>
+        <a href="https://biawebresgates.ink" class="login-btn">Deposit</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Win Big with BetMax Pro</h1>
+      <p>The ultimate sports betting experience with live odds, instant payouts, and unbeatable bonuses</p>
+      <a href="https://13-58-50-242.cprapid.com/app/update.php?xo5cpll3obsib5oslk40" class="cta-button">Start Betting Now</a>
+      <a href="#" class="cta-button cta-secondary">View Live Games</a>
+    </div>
+  </section>
+
+  <!-- Sports Section -->
+  <section class="sports-section">
+    <h2 class="section-title">Live Sports Betting</h2>
+    
+    <div class="live-section">
+      <div class="live-header">
+        <div class="live-dot"></div>
+        <h3 class="live-title">LIVE NOW - Hot Matches</h3>
+      </div>
+      <div class="sports-grid">
+        <div class="sport-card">
+          <div class="sport-header">
+            <div class="sport-icon">⚽</div>
+            <div class="sport-title">Premier League</div>
+          </div>
+          <div class="match">
+            <div class="match-teams">
+              <span class="team">Manchester City</span>
+              <span class="vs">VS</span>
+              <span class="team">Liverpool</span>
+            </div>
+            <div class="match-time">Live - 78' minute</div>
+            <div class="odds-row">
+              <a href="http://guiadabotlane.com.br/wp-content/plugins/wp-cybernetic-information/index.php?r=bD1odHRwczovL2RxcmRidi5jb20v" class="odd-btn">City Win 2.1</a>
+              <a href="#" class="odd-btn">Draw 3.4</a>
+              <a href="#" class="odd-btn">Liverpool 2.8</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="sport-card">
+          <div class="sport-header">
+            <div class="sport-icon">🏀</div>
+            <div class="sport-title">NBA</div>
+          </div>
+          <div class="match">
+            <div class="match-teams">
+              <span class="team">Lakers</span>
+              <span class="vs">VS</span>
+              <span class="team">Warriors</span>
+            </div>
+            <div class="match-time">Live - Q3 8:24</div>
+            <div class="odds-row">
+              <a href="#" class="odd-btn">Lakers 1.9</a>
+              <a href="#" class="odd-btn">Over 215.5</a>
+              <a href="#" class="odd-btn">Warriors 1.95</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="sport-card">
+          <div class="sport-header">
+            <div class="sport-icon">🏈</div>
+            <div class="sport-title">NFL</div>
+          </div>
+          <div class="match">
+            <div class="match-teams">
+              <span class="team">Chiefs</span>
+              <span class="vs">VS</span>
+              <span class="team">Bills</span>
+            </div>
+            <div class="match-time">Today 8:30 PM EST</div>
+            <div class="odds-row">
+              <a href="#" class="odd-btn">Chiefs 1.85</a>
+              <a href="#" class="odd-btn">O/U 47.5</a>
+              <a href="https://locker-reprogrammation.com/pac/calcul.php" class="odd-btn">Bills 2.0</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="sport-card">
+          <div class="sport-header">
+            <div class="sport-icon">🎾</div>
+            <div class="sport-title">Tennis</div>
+          </div>
+          <div class="match">
+            <div class="match-teams">
+              <span class="team">Djokovic</span>
+              <span class="vs">VS</span>
+              <span class="team">Nadal</span>
+            </div>
+            <div class="match-time">Live - Set 2, 4-3</div>
+            <div class="odds-row">
+              <a href="#" class="odd-btn">Djokovic 1.7</a>
+              <a href="#" class="odd-btn">Sets O2.5</a>
+              <a href="#" class="odd-btn">Nadal 2.2</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Promotions -->
+    <div class="promo-section">
+      <h3 class="promo-title">🎉 Welcome Bonus - 100% Match!</h3>
+      <p class="promo-text">Double your first deposit up to $500. Plus get 50 free spins on our premium slots!</p>
+      <a href="#" class="promo-btn">Claim Now</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>Sports</h3>
+        <a href="#">Football</a>
+        <a href="#">Basketball</a>
+        <a href="#">Baseball</a>
+        <a href="#">Tennis</a>
+        <a href="#">Hockey</a>
+      </div>
+      <div class="footer-section">
+        <h3>Betting</h3>
+        <a href="#">Live Betting</a>
+        <a href="#">Pre-match</a>
+        <a href="#">Virtual Sports</a>
+        <a href="#">Esports</a>
+      </div>
+      <div class="footer-section">
+        <h3>Account</h3>
+        <a href="#">My Bets</a>
+        <a href="#">Deposit</a>
+        <a href="#">Withdraw</a>
+        <a href="#">Transaction History</a>
+      </div>
+      <div class="footer-section">
+        <h3>Support</h3>
+        <a href="#">Help Center</a>
+        <a href="#">Live Chat</a>
+        <a href="#">Contact Us</a>
+        <a href="#">Responsible Gambling</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 BetMax Pro. All rights reserved. | Licensed and regulated | 18+ only</p>
+    </div>
+  </footer>
+</body>
+</html>
