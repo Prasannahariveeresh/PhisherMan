@@ -103,10 +103,29 @@ The Phisherman browser extension:
 
 ---
 
----
-
 ## 📷 Screenshots
 
+Below are the key steps to using the Phisherman browser extension:
+
+### 🧭 Step 1: Visit a Suspicious Website
+![Step 1](screenshots/1.png)
+
+---
+
+### 🔍 Step 2: Enable Extension to Automatically Analyze the Page
+![Step 2](screenshots/2.png)
+
+---
+
+### 🚨 Step 3: Wait to detect Phishing links
+![Step 3](screenshots/3.png)
+
+---
+
+### ✅ Step 4: Phishing links are blocked and are highlighted
+![Step 4](screenshots/4.png)
+
+---
 
 ## 🙋‍♀️ Contributers
 
@@ -119,5 +138,3 @@ The Phisherman browser extension:
 
 * [PhishTank](https://www.phishtank.com/) for the phishing dataset.
 * Open-source tools used for feature extraction and browser extension development.
-
-```
