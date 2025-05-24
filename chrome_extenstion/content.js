@@ -64,32 +64,42 @@ if (!document.getElementById('danger-link-style')) {
       background: #b22222;
       color: white;
     }
-    .loading-overlay {
+    .loading-modal-backdrop {
       position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.5);
-      z-index: 99997;
-      display: flex;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100000;
+      display: none;
       align-items: center;
       justify-content: center;
     }
-    .loading-spinner {
-      background: white;
-      padding: 20px 30px;
-      border-radius: 10px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      text-align: center;
-      font-family: sans-serif;
+    .loading-modal-backdrop.show {
+      display: flex;
     }
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #3498db;
+    .loading-indicator {
+      background: white;
+      padding: 24px 32px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+      min-width: 280px;
+    }
+    .loading-spinner {
+      width: 20px;
+      height: 20px;
+      border: 3px solid #e3e3e3;
+      border-top: 3px solid #4a90e2;
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin: 0 auto 15px;
     }
     @keyframes spin {
       0% { transform: rotate(0deg); }
@@ -97,6 +107,34 @@ if (!document.getElementById('danger-link-style')) {
     }
   `;
   document.head.appendChild(style);
+}
+
+// Enhanced loading indicator element - now a modal
+let loadingBackdrop = document.getElementById('my-loading-backdrop');
+if (!loadingBackdrop) {
+  loadingBackdrop = document.createElement('div');
+  loadingBackdrop.id = 'my-loading-backdrop';
+  loadingBackdrop.className = 'loading-modal-backdrop';
+
+  const loadingModal = document.createElement('div');
+  loadingModal.className = 'loading-indicator';
+  loadingModal.innerHTML = `
+    <div class="loading-spinner"></div>
+    <span>Checking links for safety...</span>
+  `;
+
+  loadingBackdrop.appendChild(loadingModal);
+  document.body.appendChild(loadingBackdrop);
+}
+
+function showLoading() {
+  console.log('Showing loading modal...');
+  loadingBackdrop.classList.add('show');
+}
+
+function hideLoading() {
+  console.log('Hiding loading modal...');
+  loadingBackdrop.classList.remove('show');
 }
 
 // Tooltip popup
@@ -146,95 +184,93 @@ function showDangerModal(url) {
   document.body.appendChild(backdrop);
 }
 
-// Loading overlay functions
-function showLoading() {
-  if (document.querySelector('.loading-overlay')) return;
+// Main function that runs on page load
+(function () {
+  const anchors = Array.from(document.querySelectorAll("a[href]"));
+  const urls = anchors.map(a => a.href);
 
-  const overlay = document.createElement('div');
-  overlay.className = 'loading-overlay';
-
-  const spinner = document.createElement('div');
-  spinner.className = 'loading-spinner';
-  spinner.innerHTML = `
-    <div class="spinner"></div>
-    <div>Checking links for safety...</div>
-  `;
-
-  overlay.appendChild(spinner);
-  document.body.appendChild(overlay);
-}
-
-function hideLoading() {
-  const overlay = document.querySelector('.loading-overlay');
-  if (overlay) {
-    overlay.remove();
+  // If no links found, don't show loader
+  if (urls.length === 0) {
+    console.log('No links found on page');
+    return;
   }
-}
 
-// Main logic
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === "getUrls") {
-    const anchors = Array.from(document.querySelectorAll("a[href]"));
-    const urls = anchors.map(a => a.href);
+  console.log(`Found ${urls.length} links, starting safety check...`);
 
-    // Show loading before making the request
-    showLoading();
+  // Show loading indicator before starting fetch
+  showLoading();
 
-    fetch('http://127.0.0.1:5000/api/status', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ links: urls })
+  // Add a minimum loading time to ensure user sees the indicator
+  const minLoadingTime = 500; // 500ms minimum
+  const startTime = Date.now();
+
+  fetch('http://127.0.0.1:5000/api/status', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ links: urls })
+  })
+    .then(response => {
+      console.log(`Fetch response status: ${response.status}`);
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      return response.json();
     })
-      .then(response => {
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        return response.json();
-      })
-      .then(data => {
-        // Hide loading after receiving response
-        hideLoading();
+    .then(data => {
+      console.log('Received data:', data);
+      const blockedUrls = new Set(data.blocked_urls || []);
+      let processedCount = 0;
 
-        const blockedUrls = new Set(data.blocked_urls || []);
+      anchors.forEach(link => {
+        if (blockedUrls.has(link.href)) {
+          processedCount++;
+          link.classList.add('danger-link');
 
-        anchors.forEach(link => {
-          if (blockedUrls.has(link.href)) {
-            link.classList.add('danger-link');
+          // Wrap link inside a span for relative positioning
+          const wrapper = document.createElement('span');
+          wrapper.style.position = 'relative';
+          wrapper.style.display = 'inline-block';
+          link.parentNode.insertBefore(wrapper, link);
+          wrapper.appendChild(link);
 
-            // Wrap with span
-            const wrapper = document.createElement('span');
-            wrapper.style.position = 'relative';
-            wrapper.style.display = 'inline-block';
-            link.parentNode.insertBefore(wrapper, link);
-            wrapper.appendChild(link);
+          // Show popup on hover
+          wrapper.addEventListener('mouseenter', e => {
+            popup.style.opacity = '1';
+            window._moveDangerPopup(e.clientX, e.clientY);
+          });
+          wrapper.addEventListener('mousemove', e => {
+            window._moveDangerPopup(e.clientX, e.clientY);
+          });
+          wrapper.addEventListener('mouseleave', () => {
+            popup.style.opacity = '0';
+          });
 
-            // Hover popup
-            wrapper.addEventListener('mouseenter', e => {
-              popup.style.opacity = '1';
-              window._moveDangerPopup(e.clientX, e.clientY);
-            });
-            wrapper.addEventListener('mousemove', e => {
-              window._moveDangerPopup(e.clientX, e.clientY);
-            });
-            wrapper.addEventListener('mouseleave', () => {
-              popup.style.opacity = '0';
-            });
-
-            // Custom click behavior
-            link.addEventListener('click', e => {
-              e.preventDefault();
-              showDangerModal(link.href);
-            });
-          }
-        });
-
-        sendResponse({ status: 'done', blocked: Array.from(blockedUrls) });
-      })
-      .catch(error => {
-        // Hide loading on error as well
-        hideLoading();
-        console.error("Fetch error:", error);
-        sendResponse({ status: 'error', error: error.message });
+          // Intercept clicks
+          link.addEventListener('click', e => {
+            e.preventDefault();
+            showDangerModal(link.href);
+          });
+        }
       });
 
-    return true; // Keep the message channel open
-  }
-});
+      console.log(`Processed ${processedCount} dangerous links out of ${urls.length} total links`);
+    })
+    .catch(error => {
+      console.error("Fetch error:", error);
+      // Update loading modal to show error state briefly
+      const loadingModal = loadingBackdrop.querySelector('.loading-indicator');
+      const originalText = loadingModal.querySelector('span').textContent;
+      loadingModal.querySelector('span').textContent = 'Error checking link safety';
+      setTimeout(() => {
+        loadingModal.querySelector('span').textContent = originalText;
+      }, 2000);
+    })
+    .finally(() => {
+      // Ensure minimum loading time has passed before hiding
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
+
+      setTimeout(() => {
+        hideLoading();
+        console.log('Link safety check completed');
+      }, remainingTime);
+    });
+})();
